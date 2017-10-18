@@ -2231,3 +2231,104 @@ function EllipseNameTag(){
 }
 
 register(EllipseNameTag, "Ellipse Cloud Name Tag", "Cole Spears");
+
+function spikyPerlinNoiseCloud() {
+	
+	let relativeVar;
+	
+	if(width > height) {
+	   relativeVar = height;
+	   }
+	else{
+		relativeVar = width;
+	}
+	
+	const shapeParameter = [0, "LINES", "TRIANGLES", "TRIANGLE_STRIP", "QUADS"];
+	
+	let shape = [0 /* xoff startpoint [0] */, 
+			 0 /* yoff startpoint [1] */, 
+			 width/2 /* x-coordinate [2] */, 
+			 height/2 /* y-coordinate [3] */, 
+			 relativeVar * 0.4 /* rad1 [4] */, 
+			 relativeVar * 0.2 /* rad2 [5] */, 
+			 relativeVar * 0.125 /* amplitude [6] */, 
+			 360 /* points per ellipse [7] */, 
+			 0.2 /* xoff gradient [8] */, 
+			 0.8 /* yoff gradient [9] */,
+			 0/* type of shape [10] */];
+	
+	let innerShape = [0 /* xoff startpoint [0] */,
+			 0 /* yoff startpoint [1] */, 
+			 width/2 /* x-coordinate [2] */,
+			 height/2 /* y-coordinate [3] */,
+			 relativeVar * 0.3 /* rad1 [4] */, 
+			 relativeVar * 0.1 /* rad2 [5] */, 
+			 relativeVar* 0.06 /* amplitude [6] */, 
+			 360 /* points per ellipse [7] */, 
+			 0.2 /* xoff gradient [8] */, 
+			 0.8 /* yoff gradient [9] */,
+			 0/* type of shape [10] */];
+	
+	
+	shape[10] = random(shapeParameter);
+	
+	if(int(random(2)) == 0) {
+		shape[8] = 0.2;
+		shape[9] = 0.8;
+		innerShape[8] = 0.2;
+		innerShape[9] = 0.8;
+	   }
+	else{
+		shape[8] = 0.5;
+		shape[9] = 0.1;
+		innerShape[8] = 0.5;
+		innerShape[9] = 0.1;
+	}
+	
+	fill(0);
+	stroke(0);
+	push();
+	perlinNoiseCircle(shape);
+	pop();
+	fill(255);
+	
+	if(shape[10] == 0) {
+		push();
+		perlinNoiseCircle(innerShape);
+		pop();
+	   }
+
+function perlinNoiseCircle(array) {
+	array[0] = 0;
+	
+	switch(array[10]) {
+			case "LINES":
+				beginShape(LINES);
+			break;
+			case "TRIANGLES":
+				beginShape(TRIANGLES);
+			break;
+			case "TRIANGLE_STRIP":
+				beginShape(TRIANGLE_STRIP);
+			break;
+			case "QUADS":
+				beginShape(QUADS);
+			break;
+			case 0:
+				beginShape();
+			break;
+		   }
+	
+	for(let density = 0; density < 360; density += 360/array[7]) {
+		vertex(array[2] + sin(radians(density)) * map(noise(array[0], array[1]), 0, 1, array[4] - array[6], array[4] + array[6]), 
+		       array[3] + cos(radians(density)) * map(noise(array[0], array[1]), 0, 1, array[5] - array[6], array[5] + array[6]));
+		array[0] += array[8];
+	}
+	endShape(CLOSE);
+	array[1] += array[9];
+}
+	
+	return [100, 100, width - 200, height - 200];
+}
+
+register(spikyPerlinNoiseCloud, "Spiky Perlin Noise Cloud", "Tobias Westphal");
